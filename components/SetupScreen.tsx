@@ -162,34 +162,12 @@ const CuerdaFormModal: React.FC<{
     );
 };
 
-const PrintablePlanilla: React.FC<{ torneo: Torneo }> = ({ torneo }) => (
-    <div id="printable-planilla" className="p-8 space-y-6 bg-white text-black text-lg">
-        <div className="text-center border-b-2 border-black pb-4">
-            <h1 className="text-4xl font-bold">{torneo.name}</h1>
-            <p className="text-2xl mt-2">{torneo.tournamentManager ? `Responsable: ${torneo.tournamentManager}` : ''}</p>
-            <p className="text-xl mt-1">{torneo.date}</p>
-        </div>
-        <div className="space-y-8 pt-4">
-            {[
-                "Nombre del Criadero:", "Dueño de los gallos:", "Frente:", "ID del Anillo (A):", "Número de Placa Marcaje (Pm):", "Placa del Criadero (Pc):", "Color del Gallo:",
-                "Peso:", "Edad (meses):", "Tipo (Pollo/Gallo):", "Fenotipo (Liso/Pava):"
-            ].map(label => (
-                <div key={label} className="flex items-center space-x-4">
-                    <label className="font-bold w-1/3">{label}</label>
-                    <div className="border-b-2 border-dotted border-black flex-grow h-8"></div>
-                </div>
-            ))}
-        </div>
-    </div>
-);
-
 const TournamentRulesForm: React.FC<{
     torneo: Torneo;
     onUpdateTorneo: (updatedTorneo: Torneo) => void;
-    onPrintPlanilla: () => void;
     onOpenConflictModal: () => void;
     isReadOnly: boolean;
-}> = React.memo(({ torneo, onUpdateTorneo, onPrintPlanilla, onOpenConflictModal, isReadOnly }) => {
+}> = React.memo(({ torneo, onUpdateTorneo, onOpenConflictModal, isReadOnly }) => {
     
     const handleUpdate = (field: keyof Torneo, value: any) => {
         let newTorneoData = { ...torneo, [field]: value };
@@ -213,11 +191,6 @@ const TournamentRulesForm: React.FC<{
             <InputField label="Responsable del Torneo" value={torneo.tournamentManager || ''} onChange={e => handleUpdate('tournamentManager', e.target.value)} disabled={isReadOnly} />
             <InputField type="date" label="Fecha" value={torneo.date} onChange={e => handleUpdate('date', e.target.value)} disabled={isReadOnly} />
             <InputField type="number" label="Número de Días del Torneo" value={torneo.tournamentDays} onChange={e => handleUpdate('tournamentDays', Math.max(1, parseInt(e.target.value, 10) || 1))} min="1" disabled={isReadOnly}/>
-            <div className="pt-2">
-                <button onClick={onPrintPlanilla} type="button" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-                    Imprimir Planilla de Ingreso
-                </button>
-            </div>
             
            <h4 className="text-md font-semibold text-amber-300 mt-4 border-t border-gray-700 pt-4">Tolerancias</h4>
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -358,17 +331,6 @@ const SetupScreen: React.FC<SetupScreenProps> = ({
         return grouped;
     }, [gallos]);
 
-    const handlePrintPlanilla = useCallback(() => {
-        const printableContainer = document.querySelector('.printable-planilla-container');
-        if (printableContainer) {
-            document.body.classList.add('printing-planilla');
-            window.print();
-            document.body.classList.remove('printing-planilla');
-        } else {
-            console.error('Error al encontrar la planilla para imprimir.');
-        }
-    }, []);
-
     const isCurrentDayFinished = dailyResults.some(r => r.day === currentDay);
     const isTournamentFinished = dailyResults.length >= torneo.tournamentDays;
 
@@ -428,7 +390,6 @@ const SetupScreen: React.FC<SetupScreenProps> = ({
                             <TournamentRulesForm
                                 torneo={torneo}
                                 onUpdateTorneo={onUpdateTorneo}
-                                onPrintPlanilla={handlePrintPlanilla}
                                 onOpenConflictModal={() => setConflictModalOpen(true)}
                                 isReadOnly={isReadOnly}
                             />
@@ -592,10 +553,6 @@ const SetupScreen: React.FC<SetupScreenProps> = ({
                 onUpdateTorneo={onUpdateTorneo}
                 isReadOnly={isReadOnly}
             />
-
-             <div className="printable-planilla-container">
-                <PrintablePlanilla torneo={torneo} />
-            </div>
         </div>
     );
 };

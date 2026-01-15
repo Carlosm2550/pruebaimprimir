@@ -17,93 +17,6 @@ const formatWeightLbsOz = (totalOunces: number): string => {
     return `${lbs}.${String(oz).padStart(2, '0')} Lb.Oz`;
 };
 
-const formatWeightRaw = (totalOunces: number): string => {
-    const { lbs, oz } = toLbsOz(totalOunces);
-    return `${lbs}.${String(oz).padStart(2, '0')}`;
-};
-
-// --- PRINTABLE PROGRAMACION COMPONENT ---
-const PrintableProgramacion: React.FC<{ 
-    peleas: Pelea[]; 
-    cuerdas: Cuerda[]; 
-    torneoName: string; 
-    date: string 
-}> = ({ peleas, cuerdas, torneoName, date }) => {
-    const getCuerdaNameOnly = (id: string) => {
-        const full = cuerdas.find(p => p.id === id)?.name || 'Desconocido';
-        return full.replace(/\s\(F\d+\)$/, '').trim();
-    };
-
-    return (
-        <div className="printable-programacion-container">
-            <div className="header-print">
-                <h1>PROGRAMACIÓN DE PELEAS - {torneoName}</h1>
-                <p>Fecha: {date}</p>
-            </div>
-            <table className="programacion-table">
-                <thead>
-                    <tr>
-                        <th style={{ width: '25px' }} rowSpan={2}>N°</th>
-                        <th colSpan={8} className="bg-red-50/50">LADO ROJO (GALLO A)</th>
-                        <th style={{ width: '25px' }} rowSpan={2}>VS</th>
-                        <th colSpan={8} className="bg-blue-50/50">LADO AZUL (GALLO B)</th>
-                    </tr>
-                    <tr>
-                        {/* Red Side Headers */}
-                        <th style={{ width: '85px' }}>Cuerda</th>
-                        <th style={{ width: '40px' }}>Anillo(A)</th>
-                        <th style={{ width: '40px' }}>Placa(Pm)</th>
-                        <th style={{ width: '40px' }}>Placa(Pc)</th>
-                        <th style={{ width: '50px' }}>Color</th>
-                        <th style={{ width: '50px' }}>Fenotipo</th>
-                        <th style={{ width: '40px' }}>Tipo</th>
-                        <th style={{ width: '40px' }}>Peso</th>
-                        
-                        {/* Blue Side Headers */}
-                        <th style={{ width: '85px' }}>Cuerda</th>
-                        <th style={{ width: '40px' }}>Anillo(A)</th>
-                        <th style={{ width: '40px' }}>Placa(Pm)</th>
-                        <th style={{ width: '40px' }}>Placa(Pc)</th>
-                        <th style={{ width: '50px' }}>Color</th>
-                        <th style={{ width: '50px' }}>Fenotipo</th>
-                        <th style={{ width: '40px' }}>Tipo</th>
-                        <th style={{ width: '40px' }}>Peso</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {peleas.map((pelea) => (
-                        <tr key={pelea.id}>
-                            <td style={{ fontWeight: 'bold' }}>{pelea.fightNumber}</td>
-                            
-                            {/* ROJO (GALLO A) */}
-                            <td className="bg-rojo-print" style={{ textAlign: 'left !important', paddingLeft: '4px !important' }}>{getCuerdaNameOnly(pelea.roosterA.cuerdaId)}</td>
-                            <td className="bg-rojo-print">{pelea.roosterA.ringId}</td>
-                            <td className="bg-rojo-print">{pelea.roosterA.markingId}</td>
-                            <td className="bg-rojo-print">{pelea.roosterA.breederPlateId}</td>
-                            <td className="bg-rojo-print">{pelea.roosterA.color}</td>
-                            <td className="bg-rojo-print">{pelea.roosterA.tipoGallo}</td>
-                            <td className="bg-rojo-print">{pelea.roosterA.tipoEdad}</td>
-                            <td className="bg-rojo-print" style={{ fontFamily: 'monospace' }}>{formatWeightRaw(pelea.roosterA.weight)}</td>
-                            
-                            <td style={{ fontWeight: 'bold', fontSize: '7pt' }}>VS</td>
-                            
-                            {/* AZUL (GALLO B) */}
-                            <td className="bg-azul-print" style={{ textAlign: 'left !important', paddingLeft: '4px !important' }}>{getCuerdaNameOnly(pelea.roosterB.cuerdaId)}</td>
-                            <td className="bg-azul-print">{pelea.roosterB.ringId}</td>
-                            <td className="bg-azul-print">{pelea.roosterB.markingId}</td>
-                            <td className="bg-azul-print">{pelea.roosterB.breederPlateId}</td>
-                            <td className="bg-azul-print">{pelea.roosterB.color}</td>
-                            <td className="bg-azul-print">{pelea.roosterB.tipoGallo}</td>
-                            <td className="bg-azul-print">{pelea.roosterB.tipoEdad}</td>
-                            <td className="bg-azul-print" style={{ fontFamily: 'monospace' }}>{formatWeightRaw(pelea.roosterB.weight)}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-};
-
 // --- SCREEN ---
 interface MatchmakingScreenProps {
     results: MatchmakingResults;
@@ -143,18 +56,6 @@ const MatchmakingScreen: React.FC<MatchmakingScreenProps> = ({ results, torneo, 
         }
     };
     
-    const handlePrint = () => {
-        document.body.classList.add('printing-cartelera');
-        window.print();
-        document.body.classList.remove('printing-cartelera');
-    };
-
-    const handlePrintProgramacion = () => {
-        document.body.classList.add('printing-programacion');
-        window.print();
-        document.body.classList.remove('printing-programacion');
-    };
-
     const renderPelea = (pelea: Pelea) => (
         <div key={pelea.id} className="bg-gray-700/50 rounded-lg p-6 flex items-center justify-between fight-card">
             <div className="w-1/12 text-center text-gray-400 font-bold text-3xl">{pelea.fightNumber}</div>
@@ -188,43 +89,17 @@ const MatchmakingScreen: React.FC<MatchmakingScreenProps> = ({ results, torneo, 
     const autoFightsCount = results.mainFights.length - manualFightsCount;
 
     return (
-        <div className="space-y-6 print-target">
-            <PrintableProgramacion 
-                peleas={results.mainFights} 
-                cuerdas={cuerdas} 
-                torneoName={torneo.name} 
-                date={torneo.date} 
-            />
-
-            {/* BOTÓN FLOTANTE DE IMPRESIÓN (TOP RIGHT) */}
-            <button 
-                onClick={handlePrintProgramacion}
-                title="Imprimir Programación"
-                className="fixed top-6 right-6 z-50 p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full shadow-2xl transition-all transform hover:scale-110 active:scale-95 print:hidden group"
-            >
-                <svg className="w-8 h-8 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                </svg>
-            </button>
-
+        <div className="space-y-6">
             {/* BARRA DE ACCIONES SUPERIOR */}
-            <div className="sticky top-0 z-30 py-4 mb-6 bg-gray-900/90 backdrop-blur-md border-b border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 print-hide">
+            <div className="sticky top-0 z-30 py-4 mb-6 bg-gray-900/90 backdrop-blur-md border-b border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
                 <div className="flex items-center gap-4">
                     <button onClick={onBack} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg">Atrás</button>
                     <h2 className="hidden md:block text-2xl font-bold text-white">Cotejo de Peleas</h2>
                 </div>
                 
                 <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-                    <button onClick={handlePrintProgramacion} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transform active:scale-95 transition-all flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                        Programación
-                    </button>
-                    <button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Carteles
-                    </button>
                     {!isReadOnly && (
-                        <button onClick={onStartTournament} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg">
+                        <button onClick={onStartTournament} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow-lg transform active:scale-95 transition-all">
                             Comenzar Torneo
                         </button>
                     )}
@@ -253,7 +128,7 @@ const MatchmakingScreen: React.FC<MatchmakingScreenProps> = ({ results, torneo, 
                 </div>
             </div>
 
-            <div className="space-y-4 printable-card">
+            <div className="space-y-4">
                 <h3 className="text-xl font-bold text-amber-400">Cartelera Principal</h3>
                 {results.mainFights.length > 0 ? (
                     <div className="space-y-2">

@@ -130,17 +130,6 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ dailyResults, torneo, cue
         return winners.sort((a, b) => a.duration - b.duration).slice(0, 10);
     }, [peleas]);
 
-    const handlePrint = () => {
-        document.body.classList.add('printing-results');
-        setExpandedCuerdas(stats.map(s => s.cuerdaId)); // Expand all for printing
-        
-        setTimeout(() => {
-            window.print();
-            document.body.classList.remove('printing-results');
-            setExpandedCuerdas([]); // Collapse back after printing
-        }, 100);
-    };
-
     const getCuerdaName = (id: string) => cuerdas.find(p => p.id === id)?.name || 'Desconocido';
 
     return (
@@ -150,15 +139,12 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ dailyResults, torneo, cue
                 <p className="text-gray-400 mt-2">{torneo.name} - {torneo.date}</p>
             </div>
             
-            <div className="bg-gray-800/50 rounded-2xl shadow-lg border border-gray-700 p-4 sm:p-6 print-target">
+            <div className="bg-gray-800/50 rounded-2xl shadow-lg border border-gray-700 p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                     <h3 className="text-xl font-bold text-amber-400">Tabla de Posiciones - Día {viewingDay}</h3>
-                     <button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mt-3 sm:mt-0 print-hide">
-                        Imprimir PDF del Día
-                    </button>
                 </div>
-                <p className="text-xs text-gray-400 mb-4 print-hide">
-                    Haz clic en una fila para ver los detalles de los gallos. Todos los detalles se incluirán al imprimir.
+                <p className="text-xs text-gray-400 mb-4 print:hidden">
+                    Haz clic en una fila para ver los detalles de los gallos.
                 </p>
 
                  <div className="overflow-x-auto">
@@ -206,8 +192,8 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ dailyResults, torneo, cue
                                             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                                        </td>
                                    </tr>
-                                   <tr className={`results-details-row ${isExpanded ? '' : 'hidden print:table-row'}`}>
-                                      <td colSpan={7} className="p-4 results-details-cell bg-gray-700/10">
+                                   <tr className={`${isExpanded ? '' : 'hidden'} print:hidden`}>
+                                      <td colSpan={7} className="p-4 bg-gray-700/10">
                                         <div className="space-y-2">
                                             <h4 className="font-bold text-amber-300">Detalles de Peleas para {stat.cuerdaName}:</h4>
                                             {teamFights.length > 0 ? teamFights.map(fight => {
@@ -275,7 +261,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ dailyResults, torneo, cue
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 print-hide">
+            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 print:hidden">
                  <button onClick={onBack} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-8 rounded-lg text-lg">Volver a la Cartelera</button>
                 <button onClick={onNewTournament} className="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg">
                     Nuevo Torneo (Borrar Resultados)

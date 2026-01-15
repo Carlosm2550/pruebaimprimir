@@ -22,98 +22,100 @@
       /* Custom Scrollbar Styles */
       .custom-scrollbar {
         scrollbar-width: thin;
-        scrollbar-color: #4b5563 #1f2937; /* thumb track for Firefox */
+        scrollbar-color: #4b5563 #1f2937;
       }
       .custom-scrollbar::-webkit-scrollbar {
         width: 8px;
       }
       .custom-scrollbar::-webkit-scrollbar-track {
-        background-color: #1f2937; /* Tailwind gray-800 */
+        background-color: #1f2937;
         border-radius: 4px;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: #4b5563; /* Tailwind gray-600 */
+        background-color: #4b5563;
         border-radius: 4px;
-        border: 2px solid #1f2937; /* Creates padding around thumb */
+        border: 2px solid #1f2937;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background-color: #6b7280; /* Tailwind gray-500 */
+        background-color: #6b7280;
       }
 
-      .printable-planilla-container, .printable-programacion-container {
+      /* Global hidden printing areas */
+      .printable-programacion-container {
         display: none;
       }
 
       @media print {
         @page {
           size: A4 landscape;
-          margin: 3mm;
+          margin: 5mm;
         }
 
         body {
-          background-color: white !important;
+          background: white !important;
           color: black !important;
           font-family: Arial, Helvetica, sans-serif;
-          font-size: 8pt;
           margin: 0;
           padding: 0;
         }
         
-        /* Default hide everything */
-        .printable-area, .printable-card, #printable-planilla, .printable-programacion-container, .print-hide, .fixed {
+        /* Hide everything by default */
+        #root > div > :not(.printable-programacion-container),
+        .print-hide,
+        button,
+        .fixed,
+        header,
+        footer,
+        nav {
             display: none !important;
         }
 
-        /* Show only the targeted print area */
-        body.printing-programacion .printable-programacion-container {
+        /* Specifically show the programacion container */
+        .printable-programacion-container {
             display: block !important;
-            width: 100%;
+            width: 100% !important;
+            background: white !important;
+            color: black !important;
+            position: relative !important;
         }
 
-        /* Programacion Table Styles */
         .programacion-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
+            margin-top: 10px;
         }
+        
         .programacion-table th, .programacion-table td {
-            border: 1px solid black !important;
-            padding: 3px 2px !important;
+            border: 0.5pt solid black !important;
+            padding: 4px 2px !important;
             text-align: center !important;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-size: 8pt !important;
+            word-wrap: break-word;
+            color: black !important;
         }
+        
         .programacion-table th {
-            background-color: #e5e7eb !important;
+            background-color: #f0f0f0 !important;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 7pt;
         }
-        .bg-rojo-print { background-color: rgba(255, 0, 0, 0.03) !important; }
-        .bg-azul-print { background-color: rgba(0, 0, 255, 0.03) !important; }
 
         .header-print {
             text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            border-bottom: 1pt solid black;
+            padding-bottom: 5px;
         }
         .header-print h1 {
-            font-size: 14pt;
+            font-size: 16pt !important;
             margin: 0;
-            text-transform: uppercase;
+            color: black !important;
         }
         .header-print p {
-            font-size: 10pt;
+            font-size: 11pt !important;
             margin: 2px 0;
-        }
-
-        /* Hide all other elements on the page */
-        body.printing-programacion > div > :not(main) {
-            display: none !important;
-        }
-        
-        main > div > :not(.print-target) {
-           display: none !important;
+            color: black !important;
         }
       }
     </style>

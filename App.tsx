@@ -8,6 +8,7 @@ import LiveFightScreen from './components/LiveFightScreen';
 import ResultsScreen from './components/ResultsScreen';
 import TournamentResultsScreen from './components/TournamentResultsScreen';
 import Toaster from './components/Toaster';
+import PrintableProgramacion from './components/PrintableProgramacion';
 import { DEMO_CUERDAS, DEMO_GALLOS } from './demo-data';
 
 // --- TYPE DEFINITIONS ---
@@ -492,6 +493,14 @@ const App: React.FC = () => {
     const handleShowTournamentResults = useCallback(() => {
         setScreen(Screen.TOURNAMENT_RESULTS);
     }, []);
+
+    const handleGlobalPrint = () => {
+        if (viewingMatchmakingResults && viewingMatchmakingResults.mainFights.length > 0) {
+            window.print();
+        } else {
+            addNotification('No hay peleas generadas para imprimir en este día.', 'info');
+        }
+    };
     
     const isTournamentFinished = useMemo(() => dailyResults.length >= torneo.tournamentDays, [dailyResults, torneo.tournamentDays]);
     
@@ -562,11 +571,27 @@ const App: React.FC = () => {
     };
     
     const dayTabs = Array.from({ length: torneo.tournamentDays }, (_, i) => i + 1);
+    const hasFightsToPrint = !!viewingMatchmakingResults && viewingMatchmakingResults.mainFights.length > 0;
 
     return (
         <div className="bg-gray-900 text-gray-200 min-h-screen swirl-bg">
             <Toaster notifications={notifications} onDismiss={dismissNotification} />
-            <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+            
+            {/* ÚNICO BOTÓN FLOTANTE DE IMPRESIÓN */}
+            {hasFightsToPrint && (
+                <button 
+                    onClick={handleGlobalPrint}
+                    title="Imprimir Programación de Peleas"
+                    className="fixed top-6 right-6 z-[100] p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full shadow-2xl transition-all transform hover:scale-110 active:scale-95 print:hidden group flex items-center justify-center"
+                >
+                    <svg className="w-8 h-8 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-amber-400 font-bold uppercase text-xs">Imprimir Programación</span>
+                </button>
+            )}
+
+            <div className="container mx-auto p-4 sm:p-6 lg:p-8 relative">
                 <header className="flex items-center space-x-4 mb-8">
                     <TrophyIcon className="w-10 h-10 text-amber-400" />
                     <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wider">GalleraPro <span className="text-amber-500 font-light">- 100% Peleas de gallos</span></h1>
@@ -623,6 +648,17 @@ const App: React.FC = () => {
                     © {new Date().getFullYear()} GalleraPro. Todos los derechos reservados.
                 </footer>
             </div>
+
+            {/* CONTENIDO IMPRIMIBLE (OCULTO POR DEFECTO EN PANTALLA) */}
+            {viewingMatchmakingResults && (
+                <PrintableProgramacion 
+                    peleas={viewingMatchmakingResults.mainFights} 
+                    cuerdas={cuerdas} 
+                    torneoName={torneo.name} 
+                    date={torneo.date} 
+                    day={torneo.tournamentDays > 1 ? viewingDay : undefined}
+                />
+            )}
         </div>
     );
 };
